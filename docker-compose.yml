@@ -1,0 +1,61 @@
+services:
+  app:
+    build:
+      context: .
+    image: conciliabot:latest
+    restart: unless-stopped
+    # Compose reads ./.env automatically (copy .env.example -> .env).
+    environment:
+      CONCILIABOT_AUTH: "${CONCILIABOT_AUTH:-on}"
+      CONCILIABOT_AUTH_TOKEN: "${CONCILIABOT_AUTH_TOKEN:-}"
+      CONCILIABOT_DB_KEY: "${CONCILIABOT_DB_KEY:-}"
+      CONCILIABOT_ALLOW_PRIVATE: "${CONCILIABOT_ALLOW_PRIVATE:-on}"
+      CONCILIABOT_WEBMOCK: "${CONCILIABOT_WEBMOCK:-on}"
+      CONCILIABOT_RATE_LIMIT: "${CONCILIABOT_RATE_LIMIT:-60}"
+      CONCILIABOT_DOCUMENT_RETENTION_DAYS: "${CONCILIABOT_DOCUMENT_RETENTION_DAYS:-90}"
+      CONCILIABOT_ERP_PROVIDER: "${CONCILIABOT_ERP_PROVIDER:-demo}"
+      COREBIZ_BASE_URL: "${COREBIZ_BASE_URL:-}"
+      COREBIZ_API_KEY: "${COREBIZ_API_KEY:-}"
+      COREBIZ_TENANT_ID: "${COREBIZ_TENANT_ID:-}"
+      CONCILIABOT_LLM: "${CONCILIABOT_LLM:-off}"
+      CONCILIABOT_LLM_BASE_URL: "${CONCILIABOT_LLM_BASE_URL:-}"
+      CONCILIABOT_LLM_API_KEY: "${CONCILIABOT_LLM_API_KEY:-}"
+      # Chromium needs its sandbox off inside an unprivileged container.
+      CONCILIABOT_BROWSER_NO_SANDBOX: "on"
+    volumes:
+      # BYOC: local state (SQLite, api_token, erp.json) lives on the host.
+      - ./backend/data:/app/backend/data
+    expose:
+      - "8000"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health').read()",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SITE_ADDRESS: "${SITE_ADDRESS:-localhost}"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:

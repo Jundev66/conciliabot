@@ -1,0 +1,28 @@
+# Version control / meta
+.git
+.gitignore
+.github
+
+# Docs
+docs
+*.md
+LICENSE
+
+# Node (the image rebuilds the PWA itself)
+node_modules
+dist
+dist-ssr
+
+# Python (never ship local state or the venv)
+backend/.venv
+backend/data
+backend/.pytest_cache
+**/__pycache__
+**/*.pyc
+
+# Local env / deployment files (not needed inside the image)
+.env
+.env.*
+!.env.example
+docker-compose.yml
+Caddyfile

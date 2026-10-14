@@ -1,0 +1,12 @@
+fastapi>=0.115
+uvicorn>=0.34
+pydantic>=2.11
+python-multipart>=0.0.20
+httpx>=0.28
+pytest>=8.3
+mcp>=1.9
+playwright>=1.47
+cryptography>=43
+openpyxl>=3.1
+pypdf>=5.0
+reportlab>=4.0

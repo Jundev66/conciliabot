@@ -1,0 +1,12 @@
+# Caddy terminates TLS and proxies to the backend (API + PWA on one origin).
+#
+# Default: internal CA, meant for a LAN hostname/IP (BYOC). Browsers will warn
+# until the CA is trusted on each device (see README).
+#
+# For a public domain, delete the "tls internal" line: Caddy will obtain a
+# Let's Encrypt certificate automatically (ports 80/443 must be reachable).
+{$SITE_ADDRESS:localhost} {
+	tls internal
+	encode zstd gzip
+	reverse_proxy app:8000
+}
