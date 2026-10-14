@@ -23,7 +23,7 @@ jobs:
         run: python -m playwright install --with-deps chromium
       - name: Unit tests (MCP + browser fallback included)
         run: pytest -q
-      - name: Evals (gate: bloquea si bajan las puntuaciones)
+      - name: "Evals (gate: bloquea si bajan las puntuaciones)"
         run: python -m app.evals.runner
 
   frontend:
